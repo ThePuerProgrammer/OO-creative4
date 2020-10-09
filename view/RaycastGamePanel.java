@@ -10,8 +10,8 @@ import javax.swing.JPanel;
 
 public class RaycastGamePanel {
 
-    protected final int HEIGHT = 500;
-    protected final int WIDTH = 500;
+    protected final int HEIGHT = 600;
+    protected final int WIDTH = 600;
     private final Dimension gameView = new Dimension(WIDTH, HEIGHT); 
 
     private JFrame window;
@@ -33,7 +33,7 @@ public class RaycastGamePanel {
         // set pref sizes
         panel2D.setPreferredSize(gameView);
         panel3D.setPreferredSize(gameView);
-        spacer.setPreferredSize(new Dimension(50, HEIGHT));
+        spacer.setPreferredSize(new Dimension(50, HEIGHT + 5));
 
         // add canvas to panels and panels to container
         panel2D.add(canvas2D);
@@ -43,8 +43,8 @@ public class RaycastGamePanel {
         contentPane.add(BorderLayout.CENTER, spacer);
 
         // set background colors
-        panel2D.setBackground(Color.BLACK);
-        panel3D.setBackground(Color.BLACK);
+        panel2D.setBackground(Color.DARK_GRAY);
+        panel3D.setBackground(Color.DARK_GRAY);
         spacer.setBackground(Color.DARK_GRAY);
     }
 }
