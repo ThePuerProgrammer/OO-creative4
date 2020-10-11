@@ -1,6 +1,5 @@
 package view;
 
-import javax.swing.BorderFactory;
 import javax.swing.JPanel;
 
 import java.awt.Color;
@@ -17,7 +16,6 @@ public class RaycastCanvas3D extends JPanel {
         this.raycastGamePanel = raycastGamePanel;
         setBackground(Color.BLACK);
         setPreferredSize(new Dimension(raycastGamePanel.WIDTH, raycastGamePanel.HEIGHT));
-        setBorder(BorderFactory.createLineBorder(Color.DARK_GRAY, 10));
     }
 
     @Override

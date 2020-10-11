@@ -8,7 +8,7 @@ public class Main {
         window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         window.setTitle("Generic Raycasting Demo");
         window.setResizable(false);
-        window.setLocation(200, 200);
+        window.setLocation(70, 150);
 
         RaycastGamePanel raycastGamePanel = new RaycastGamePanel(window);
         raycastGamePanel.init();
