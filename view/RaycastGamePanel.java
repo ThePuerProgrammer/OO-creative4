@@ -110,7 +110,7 @@ public class RaycastGamePanel implements Runnable {
 
     public void tick() {
         if (up) {
-            canvas2D.up();
+            canvas2D.forward();
         } else if (down) {
             canvas2D.down();
         }

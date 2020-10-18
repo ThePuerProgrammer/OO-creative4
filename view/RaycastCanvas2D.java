@@ -3,6 +3,7 @@ package view;
 import javax.swing.JPanel;
 
 import model.Player;
+import model.Vertex;
 
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -45,19 +46,28 @@ public class RaycastCanvas2D extends JPanel {
         player.render(g2);
     }
 
-    public void up() {
-        player.setY(player.getY() - PLAYER_SPEED);
+    public void forward() {
+        Vertex v = player.getV();
+        int x = (int)v.getX() + player.getX();
+        int y = (int)v.getY() + player.getY();
+        player.setX(player.getX() + (x - player.getX()) / 6);
+        player.setY(player.getY() + (y - player.getY()) / 6);
+
     }
 
     public void down() {
-        player.setY(player.getY() + PLAYER_SPEED);
+        Vertex v = player.getV();
+        int x = (int)v.getX() + player.getX();
+        int y = (int)v.getY() + player.getY();
+        player.setX(player.getX() - (x - player.getX()) / 6);
+        player.setY(player.getY() - (y - player.getY()) / 6);
     }
 
     public void left() {
-        player.setX(player.getX() - PLAYER_SPEED);
+        player.rotateZ(-1);
     }
 
     public void right() {
-        player.setX(player.getX() + PLAYER_SPEED);
+        player.rotateZ(1);
     }
 }
