@@ -6,23 +6,20 @@ import java.awt.Graphics2D;
 public class Player {
     private int x;
     private int y;
-    private int viewX;
-    private int viewY;
+    private Vertex v;
     private Color c;
 
     public Player() {
         x = 290;
         y = 290;
-        viewX = x + 30;
-        viewY = y + 10;
-
+        v = new Vertex(x + 30, y + 10, 0);
         c = new Color(255, 0, 0);
     }
 
     public void render(Graphics2D g2) {
         g2.setColor(c);
         g2.fillOval(x, y, 20, 20);
-        g2.drawLine(x + 10, y + 10, viewX, viewY);
+        g2.drawLine(x + 10, y + 10, (int)v.getX(), (int)v.getY());
     }
     
     public void setX(int x) {

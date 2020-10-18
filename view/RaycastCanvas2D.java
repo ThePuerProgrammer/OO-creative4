@@ -16,6 +16,7 @@ public class RaycastCanvas2D extends JPanel {
     private Player player;
     private int width;
     private int height;
+    private final int PLAYER_SPEED = 2;
     
     public RaycastCanvas2D(RaycastGamePanel raycastGamePanel) {
         this.raycastGamePanel = raycastGamePanel;
@@ -42,5 +43,21 @@ public class RaycastCanvas2D extends JPanel {
         }
 
         player.render(g2);
+    }
+
+    public void up() {
+        player.setY(player.getY() - PLAYER_SPEED);
+    }
+
+    public void down() {
+        player.setY(player.getY() + PLAYER_SPEED);
+    }
+
+    public void left() {
+        player.setX(player.getX() - PLAYER_SPEED);
+    }
+
+    public void right() {
+        player.setX(player.getX() + PLAYER_SPEED);
     }
 }

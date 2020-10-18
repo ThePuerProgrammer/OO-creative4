@@ -8,11 +8,31 @@ import java.awt.Color;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
+import controller.PlayerListener;
+
 public class RaycastGamePanel implements Runnable {
 
     protected final int HEIGHT = 600;
     protected final int WIDTH = 600;
     private final Dimension gameView = new Dimension(WIDTH, HEIGHT); 
+    private Color bg = new Color(40, 90, 80);
+    private Thread thread;
+    private RaycastCanvas2D canvas2D;
+    private RaycastCanvas3D canvas3D;
+    private PlayerListener l;
+    private final int FPS = 60;
+    private final int TIME = 1000 / FPS;
+
+    private boolean up;
+    private boolean down;
+    private boolean left;
+    private boolean right;
+
+    private enum GameState {
+        STANDBY, RUNNING
+    }
+
+    GameState gameState;
 
     private JFrame window;
 
@@ -30,8 +50,8 @@ public class RaycastGamePanel implements Runnable {
         JPanel panel2D = new JPanel();
         JPanel panel3D = new JPanel();
         JPanel spacer = new JPanel();
-        RaycastCanvas2D canvas2D = new RaycastCanvas2D(this);
-        RaycastCanvas3D canvas3D = new RaycastCanvas3D(this);
+        canvas2D = new RaycastCanvas2D(this);
+        canvas3D = new RaycastCanvas3D(this);
 
         // set pref sizes
         surface.setPreferredSize(new Dimension(WIDTH * 2 + 100, HEIGHT + 20));
@@ -48,17 +68,73 @@ public class RaycastGamePanel implements Runnable {
         contentPane.add(surface);
 
         // set background colors
-        surface.setBackground(Color.DARK_GRAY);
-        panel2D.setBackground(Color.DARK_GRAY);
-        panel3D.setBackground(Color.DARK_GRAY);
-        spacer.setBackground(Color.DARK_GRAY);
+        surface.setBackground(bg);
+        panel2D.setBackground(bg);
+        panel3D.setBackground(bg);
+        spacer.setBackground(bg);
+
+        l = new PlayerListener(this);
+        window.addKeyListener(l);
 
         canvas2D.repaint();
+        start();
+    }
+
+    public void start() {
+        gameState = GameState.RUNNING;
+        thread = new Thread(this);
+        thread.start();
     }
 
     @Override
     public void run() {
-        // TODO Auto-generated method stub
+        while (gameState == GameState.RUNNING) {
+            // To aim for consistent FPS
+            long nano = System.nanoTime();
+            tick();
+            canvas2D.repaint();
+            canvas3D.repaint();
+            long updated = System.nanoTime() - nano;
+            long buffer = TIME - updated / 1_000_000;
+            if (buffer <= 0) {
+                buffer = 5;
+            }
+            try {
+                Thread.sleep(buffer);
+            } catch (Exception e) {
+                System.out.println("Caught Exception - Thread.sleep(buffer)");
+                System.exit(1);
+            }
+        }
+    }
 
+    public void tick() {
+        if (up) {
+            canvas2D.up();
+        } else if (down) {
+            canvas2D.down();
+        }
+
+        if (left) {
+            canvas2D.left();
+        } else if (right) {
+            canvas2D.right();
+        }
+    }
+
+    public void setUp(boolean up) {
+        this.up = up;
+    }
+
+    public void setDown(boolean down) {
+        this.down = down;
+    }
+
+    public void setRight(boolean right) {
+        this.right = right;
+    }
+
+    public void setLeft(boolean left) {
+        this.left = left;
     }
 }
