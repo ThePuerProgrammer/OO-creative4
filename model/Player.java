@@ -2,6 +2,8 @@ package model;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.Rectangle;
+import java.awt.BasicStroke;
 
 public class Player {
     private int x;
@@ -24,6 +26,9 @@ public class Player {
     public void render(Graphics2D g2) {
         g2.setColor(c);
         g2.fillOval(x, y, 20, 20);
+        g2.setColor(Color.BLACK);
+        g2.setStroke(new BasicStroke(3));
+        g2.drawOval(x, y, 20, 20);
         g2.translate(x + 10, y + 10);
         g2.drawLine(0, 0, (int)v.getX(), (int)v.getY());
     }
@@ -80,4 +85,7 @@ public class Player {
         zRotationMatrix = matrix;
     }
 
+    public Rectangle getBoundary(int x2, int y2) {
+        return new Rectangle(x2, y2, 20, 20);
+    }
 }

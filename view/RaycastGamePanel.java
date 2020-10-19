@@ -15,7 +15,7 @@ public class RaycastGamePanel implements Runnable {
     protected final int HEIGHT = 600;
     protected final int WIDTH = 600;
     private final Dimension gameView = new Dimension(WIDTH, HEIGHT); 
-    private Color bg = new Color(40, 90, 80);
+    private Color bg = new Color(2, 15, 20);
     private Thread thread;
     private RaycastCanvas2D canvas2D;
     private RaycastCanvas3D canvas3D;
