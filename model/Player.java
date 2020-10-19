@@ -16,9 +16,9 @@ public class Player {
     public Player() {
         x = 290;
         y = 290;
-        v = new Vertex(  0, -20, 0);
-        vL = new Vertex(-20,   0, 0);
-        vR = new Vertex( 20,   0, 0);
+        v = new Vertex(  0, -10, 0);
+        vL = new Vertex(-10,   0, 0);
+        vR = new Vertex( 10,   0, 0);
         c = new Color(255,  0, 0);
     }
 

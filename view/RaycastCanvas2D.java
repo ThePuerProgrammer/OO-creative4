@@ -9,6 +9,7 @@ import model.Vertex;
 
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -81,11 +82,7 @@ public class RaycastCanvas2D extends JPanel {
 
         setPreferredSize(new Dimension(width, height));
         player = new Player();
-        rays.add(new Ray(
-            player.getX() + 10 + (player.getV().getY() / Math.tan(player.getV().getTheta())),
-            player.getY() + 10 + (player.getV().getX() * Math.tan(player.getV().getTheta())),
-            0
-        ));
+        castRays();
         // top walls
         for (int i = 0; i < 8; ++i) {
             boundaries.add(new Boundary(width / 8 * i, 0, width / 8, height / 8, boundaryColor));
@@ -133,7 +130,7 @@ public class RaycastCanvas2D extends JPanel {
         }
 
         for (var r: rays) {
-            r.render(g2, player.getX() + 10, player.getY() + 10);
+            r.render(g2, player.getX() + 10, player.getY() + 10, (int)(r.getX() + player.getX() + 10), (int)(r.getY() + player.getY() + 10));
         }
 
         // translate happens at end of function. Make last render
@@ -147,15 +144,15 @@ public class RaycastCanvas2D extends JPanel {
         int y = (int)v.getY() + player.getY();
         for (var b: boundaries) {
             if (player.getBoundary(
-                player.getX() + (x - player.getX()) / 6, 
-                player.getY() + (y - player.getY()) / 6
+                player.getX() + (x - player.getX()) / 3, 
+                player.getY() + (y - player.getY()) / 3
                 ).intersects(b.getBoundary())) {
                 hitwall = true;
             }
         }
         if (!hitwall) {
-            player.setX(player.getX() + (x - player.getX()) / 6);
-            player.setY(player.getY() + (y - player.getY()) / 6);
+            player.setX(player.getX() + (x - player.getX()) / 3);
+            player.setY(player.getY() + (y - player.getY()) / 3);
         }
         castRays();
     }
@@ -167,15 +164,15 @@ public class RaycastCanvas2D extends JPanel {
         int y = (int)v.getY() + player.getY();
         for (var b: boundaries) {
             if (player.getBoundary(
-                player.getX() - (x - player.getX()) / 6,
-                player.getY() - (y - player.getY()) / 6
+                player.getX() - (x - player.getX()) / 3,
+                player.getY() - (y - player.getY()) / 3
                 ).intersects(b.getBoundary())) {
                 hitwall = true;
             }
         }
         if (!hitwall) {
-            player.setX(player.getX() - (x - player.getX()) / 6);
-            player.setY(player.getY() - (y - player.getY()) / 6);
+            player.setX(player.getX() - (x - player.getX()) / 3);
+            player.setY(player.getY() - (y - player.getY()) / 3);
         }
         castRays();
     }
@@ -242,12 +239,24 @@ public class RaycastCanvas2D extends JPanel {
 
     public void castRays() {
         // clear array
+        rays.clear();
         // generate array
+        for (int i = 1; i < 20; ++i) {
+            Vertex v = new Vertex(player.getV());
+            v.rotateZ(-1, i);
+            rays.add(new Ray(v));
+        }
+        for (int i = 1; i < 20; ++i) {
+            Vertex v = new Vertex(player.getV());
+            v.rotateZ(1, i);
+            rays.add(new Ray(v));
+        }
+        rays.add(new Ray(player.getV()));
         // cast rays
         for (var r: rays) {
-            double dx = r.getX();
-            double dy = r.getY();
-            while (!insideBoundary(r.getX(), r.getY())) {
+            double dx = r.getX() / 20;
+            double dy = r.getY() / 20;
+            while ((dx != 0 || dy != 0) && !insideBoundary(r.getX() + player.getX() + 10, r.getY() + player.getY() + 10)) {
                 r.castRay(dx, dy);
             }
             r.castRay(-dx, -dy);
@@ -259,13 +268,13 @@ public class RaycastCanvas2D extends JPanel {
         if (x < 0 || x > width || y < 0 || y > height) return true;
 
         int ySwitch = 7;
-        if (y > yGridG) y = 6;
-        if (y > yGridF) y = 5;
-        if (y > yGridE) y = 4;
-        if (y > yGridD) y = 3;
-        if (y > yGridC) y = 2;
-        if (y > yGridB) y = 1;
-        if (y > yGridA) y = 0;
+        if (y < yGridG) ySwitch = 6;
+        if (y < yGridF) ySwitch = 5;
+        if (y < yGridE) ySwitch = 4;
+        if (y < yGridD) ySwitch = 3;
+        if (y < yGridC) ySwitch = 2;
+        if (y < yGridB) ySwitch = 1;
+        if (y < yGridA) ySwitch = 0;
 
         switch (ySwitch) {
             case 0:
