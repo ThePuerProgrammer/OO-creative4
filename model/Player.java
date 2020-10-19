@@ -9,18 +9,17 @@ public class Player {
     private int x;
     private int y;
     private Vertex v;
+    private Vertex vL;
+    private Vertex vR;
     private Color c;
-    private double heading;
-    private double cosTheta;
-    private double sinTheta;
-    private double[][] zRotationMatrix;
-    private int headingSpeed = 3;
 
     public Player() {
         x = 290;
         y = 290;
-        v = new Vertex(0, - 20, 0);
-        c = new Color(255, 0, 0);
+        v = new Vertex(  0, -20, 0);
+        vL = new Vertex(-20,   0, 0);
+        vR = new Vertex( 20,   0, 0);
+        c = new Color(255,  0, 0);
     }
 
     public void render(Graphics2D g2) {
@@ -30,9 +29,13 @@ public class Player {
         g2.setStroke(new BasicStroke(3));
         g2.drawOval(x, y, 20, 20);
         g2.translate(x + 10, y + 10);
-        g2.drawLine(0, 0, (int)v.getX(), (int)v.getY());
+        g2.drawLine(0, 0, (int)(v.getX()), (int)(v.getY()));
     }
-    
+
+    public Rectangle getBoundary(int x2, int y2) {
+        return new Rectangle(x2, y2, 20, 20);
+    }
+
     public void setX(int x) {
         this.x = x;
     }
@@ -53,39 +56,11 @@ public class Player {
         return v;
     }
 
-    public void rotateZ(int direction) {
-        updateHeading(direction);
-        rotate(zRotationMatrix);
+    public Vertex getVL() {
+        return vL;
     }
 
-    private void rotate(double[][] matrix) {
-        double[][] result = VMath.matMul2D(matrix, VMath.convertVertexToMatrix(v));
-        v.updateVertex(result[0][0], result[1][0], result[2][0]);
-    }
-
-
-    private void updateHeading(int direction) {
-        assert(direction == -1 || direction == 1);
-        if (direction == -1) {
-            heading = -headingSpeed;
-        } else {
-            heading =  headingSpeed;
-        }
-        cosTheta = Math.cos(Math.toRadians(heading));
-        sinTheta = Math.sin(Math.toRadians(heading));
-        updateZRotationMatrix();
-    }
-
-    public void updateZRotationMatrix() {
-        double[][] matrix = {
-            {cosTheta, -sinTheta, 0},
-            {sinTheta, cosTheta, 0},
-            {       0,         0, 1}
-        };
-        zRotationMatrix = matrix;
-    }
-
-    public Rectangle getBoundary(int x2, int y2) {
-        return new Rectangle(x2, y2, 20, 20);
+    public Vertex getVR() {
+        return vR;
     }
 }

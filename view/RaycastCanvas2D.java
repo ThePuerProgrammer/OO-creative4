@@ -4,6 +4,7 @@ import javax.swing.JPanel;
 
 import model.Boundary;
 import model.Player;
+import model.Ray;
 import model.Vertex;
 
 import java.awt.Graphics;
@@ -19,49 +20,96 @@ public class RaycastCanvas2D extends JPanel {
     private Player player;
     private int width;
     private int height;
-    private final int PLAYER_SPEED = 2;
     private ArrayList<Boundary> boundaries = new ArrayList<>();
+    private ArrayList<Ray> rays = new ArrayList<>();
     private final Color boundaryColor = new Color(5, 5, 5);
     private final Color lineColor = new Color(220,220,220);
+    private final int PLAYER_SPEED = 2;
+
+    // grid lines for raycasting
+    // horizonal 
+    private int xGridA;
+    private int xGridB;
+    private int xGridC;
+    private int xGridD;
+    private int xGridE;
+    private int xGridF;
+    private int xGridG;
+    // vertical
+    private int yGridA;
+    private int yGridB;
+    private int yGridC;
+    private int yGridD;
+    private int yGridE;
+    private int yGridF;
+    private int yGridG;
+
+    private boolean[][] map = {
+        { true,  true,  true,  true,  true,  true,  true,  true},
+        { true, false, false, false, false,  true, false,  true},
+        { true, false,  true, false, false,  true, false,  true},
+        { true, false,  true, false, false, false, false,  true},
+        { true, false, false, false, false, false, false,  true},
+        { true,  true,  true,  true,  true, false, false,  true},
+        { true, false, false, false, false, false,  true,  true},
+        { true,  true,  true,  true,  true,  true,  true,  true}
+    };
     
     public RaycastCanvas2D(RaycastGamePanel raycastGamePanel) {
         this.raycastGamePanel = raycastGamePanel;
         setBackground(Color.DARK_GRAY);
         width = raycastGamePanel.WIDTH;
         height = raycastGamePanel.HEIGHT;
+
+        // horizonal 
+        xGridA = width / 8;
+        xGridB = width / 8 * 2;
+        xGridC = width / 8 * 3;
+        xGridD = width / 8 * 4;
+        xGridE = width / 8 * 5;
+        xGridF = width / 8 * 6;
+        xGridG = width / 8 * 7;
+
+        // vertical
+        yGridA = height / 8;
+        yGridB = height / 8 * 2;
+        yGridC = height / 8 * 3;
+        yGridD = height / 8 * 4;
+        yGridE = height / 8 * 5;
+        yGridF = height / 8 * 6;
+        yGridG = height / 8 * 7;
+
         setPreferredSize(new Dimension(width, height));
         player = new Player();
-
+        rays.add(new Ray(
+            player.getX() + 10 + (player.getV().getY() / Math.tan(player.getV().getTheta())),
+            player.getY() + 10 + (player.getV().getX() * Math.tan(player.getV().getTheta())),
+            0
+        ));
         // top walls
         for (int i = 0; i < 8; ++i) {
             boundaries.add(new Boundary(width / 8 * i, 0, width / 8, height / 8, boundaryColor));
         }
-
         // bottom walls
         for (int i = 0; i < 8; ++i) {
             boundaries.add(new Boundary(width / 8 * i, height - height / 8, width / 8, height / 8, boundaryColor));
         }
-
         // left walls
         for (int i = 0; i < 8; ++i) {
             boundaries.add(new Boundary(0, height / 8 * i, width / 8, height / 8, boundaryColor));
         }
-
         // right walls
         for (int i = 0; i < 8; ++i) {
             boundaries.add(new Boundary(width - width / 8, height / 8 * i, width / 8, height / 8, boundaryColor));
         }
-
         boundaries.add(new Boundary(width / 8 * 5, height / 8 * 2, width / 8, height / 8, boundaryColor));
         boundaries.add(new Boundary(width / 8 * 5, height / 8 * 1, width / 8, height / 8, boundaryColor));
         for (int i = 1; i < 5; ++i) {
             boundaries.add(new Boundary(width / 8 * i, height / 8 * 5, width / 8, height / 8, boundaryColor));
         }
-
         for (int i = 2; i < 4; ++i) {
             boundaries.add(new Boundary(width / 8 * 2, height / 8 * i, width / 8, height / 8, boundaryColor));
         }
-
         boundaries.add(new Boundary(width / 8 * 6, height / 8 * 6, width / 8, height / 8, boundaryColor));
     }
 
@@ -72,16 +120,20 @@ public class RaycastCanvas2D extends JPanel {
         g2 = (Graphics2D) g;
 
         g2.setColor(lineColor);
-        for (int i = 0; i < 8; ++i) {
+        for (int i = 1; i < 8; ++i) {
             g2.drawLine(width / 8 * i, 0, width / 8 * i, height);
         }
 
-        for (int i = 0; i < 8; ++i) {
+        for (int i = 1; i < 8; ++i) {
             g2.drawLine(0, height / 8 * i, width, height / 8 * i);
         }
 
         for (var b: boundaries) {
             b.render(g2);
+        }
+
+        for (var r: rays) {
+            r.render(g2, player.getX() + 10, player.getY() + 10);
         }
 
         // translate happens at end of function. Make last render
@@ -105,6 +157,7 @@ public class RaycastCanvas2D extends JPanel {
             player.setX(player.getX() + (x - player.getX()) / 6);
             player.setY(player.getY() + (y - player.getY()) / 6);
         }
+        castRays();
     }
 
     public void down() {
@@ -124,13 +177,187 @@ public class RaycastCanvas2D extends JPanel {
             player.setX(player.getX() - (x - player.getX()) / 6);
             player.setY(player.getY() - (y - player.getY()) / 6);
         }
+        castRays();
     }
 
     public void left() {
-        player.rotateZ(-1);
+        player.getV().rotateZ(-1);
+        player.getVL().rotateZ(-1);
+        player.getVR().rotateZ(-1);
+        for (var r: rays) {
+            r.rotateZ(-1);
+        }
+        castRays();
+    }
+
+    public void strafeLeft() {
+        boolean hitwall = false;
+        Vertex v = player.getVL();
+        int x = (int)v.getX() + player.getX();
+        int y = (int)v.getY() + player.getY();
+        for (var b: boundaries) {
+            if (player.getBoundary(
+                player.getX() + (x - player.getX()) / 6, 
+                player.getY() + (y - player.getY()) / 6
+                ).intersects(b.getBoundary())) {
+                hitwall = true;
+            }
+        }
+        if (!hitwall) {
+            player.setX(player.getX() + (x - player.getX()) / 6);
+            player.setY(player.getY() + (y - player.getY()) / 6);
+        }
+        castRays();
+    }
+
+    public void strafeRight() {
+        boolean hitwall = false;
+        Vertex v = player.getVR();
+        int x = (int)v.getX() + player.getX();
+        int y = (int)v.getY() + player.getY();
+        for (var b: boundaries) {
+            if (player.getBoundary(
+                player.getX() + (x - player.getX()) / 6, 
+                player.getY() + (y - player.getY()) / 6
+                ).intersects(b.getBoundary())) {
+                hitwall = true;
+            }
+        }
+        if (!hitwall) {
+            player.setX(player.getX() + (x - player.getX()) / 6);
+            player.setY(player.getY() + (y - player.getY()) / 6);
+        }
+        castRays();
     }
 
     public void right() {
-        player.rotateZ(1);
+        player.getV().rotateZ(1);
+        player.getVL().rotateZ(1);
+        player.getVR().rotateZ(1);
+        for (var r: rays) {
+            r.rotateZ(1);
+        }
+        castRays();
+    }
+
+    public void castRays() {
+        // clear array
+        // generate array
+        // cast rays
+        for (var r: rays) {
+            double dx = r.getX();
+            double dy = r.getY();
+            while (!insideBoundary(r.getX(), r.getY())) {
+                r.castRay(dx, dy);
+            }
+            r.castRay(-dx, -dy);
+        }
+    }
+
+    private boolean insideBoundary(double x, double y) {
+
+        if (x < 0 || x > width || y < 0 || y > height) return true;
+
+        int ySwitch = 7;
+        if (y > yGridG) y = 6;
+        if (y > yGridF) y = 5;
+        if (y > yGridE) y = 4;
+        if (y > yGridD) y = 3;
+        if (y > yGridC) y = 2;
+        if (y > yGridB) y = 1;
+        if (y > yGridA) y = 0;
+
+        switch (ySwitch) {
+            case 0:
+                if (x > 0      && x < xGridA) return map[0][0];
+                if (x > xGridA && x < xGridB) return map[0][1];
+                if (x > xGridB && x < xGridC) return map[0][2];
+                if (x > xGridC && x < xGridD) return map[0][3];
+                if (x > xGridD && x < xGridE) return map[0][4];
+                if (x > xGridE && x < xGridF) return map[0][5];
+                if (x > xGridF && x < xGridG) return map[0][6];
+                if (x > xGridG && x <  width) return map[0][7];
+                break;
+
+            case 1:
+                if (x > 0      && x < xGridA) return map[1][0];
+                if (x > xGridA && x < xGridB) return map[1][1];
+                if (x > xGridB && x < xGridC) return map[1][2];
+                if (x > xGridC && x < xGridD) return map[1][3];
+                if (x > xGridD && x < xGridE) return map[1][4];
+                if (x > xGridE && x < xGridF) return map[1][5];
+                if (x > xGridF && x < xGridG) return map[1][6];
+                if (x > xGridG && x <  width) return map[1][7];
+                break;
+
+            case 2:
+                if (x > 0      && x < xGridA) return map[2][0];
+                if (x > xGridA && x < xGridB) return map[2][1];
+                if (x > xGridB && x < xGridC) return map[2][2];
+                if (x > xGridC && x < xGridD) return map[2][3];
+                if (x > xGridD && x < xGridE) return map[2][4];
+                if (x > xGridE && x < xGridF) return map[2][5];
+                if (x > xGridF && x < xGridG) return map[2][6];
+                if (x > xGridG && x <  width) return map[2][7];
+                break;
+
+            case 3:
+                if (x > 0      && x < xGridA) return map[3][0];
+                if (x > xGridA && x < xGridB) return map[3][1];
+                if (x > xGridB && x < xGridC) return map[3][2];
+                if (x > xGridC && x < xGridD) return map[3][3];
+                if (x > xGridD && x < xGridE) return map[3][4];
+                if (x > xGridE && x < xGridF) return map[3][5];
+                if (x > xGridF && x < xGridG) return map[3][6];
+                if (x > xGridG && x <  width) return map[3][7];
+                break;
+
+            case 4:
+                if (x > 0      && x < xGridA) return map[4][0];
+                if (x > xGridA && x < xGridB) return map[4][1];
+                if (x > xGridB && x < xGridC) return map[4][2];
+                if (x > xGridC && x < xGridD) return map[4][3];
+                if (x > xGridD && x < xGridE) return map[4][4];
+                if (x > xGridE && x < xGridF) return map[4][5];
+                if (x > xGridF && x < xGridG) return map[4][6];
+                if (x > xGridG && x <  width) return map[4][7];
+                break;
+
+            case 5:
+                if (x > 0      && x < xGridA) return map[5][0];
+                if (x > xGridA && x < xGridB) return map[5][1];
+                if (x > xGridB && x < xGridC) return map[5][2];
+                if (x > xGridC && x < xGridD) return map[5][3];
+                if (x > xGridD && x < xGridE) return map[5][4];
+                if (x > xGridE && x < xGridF) return map[5][5];
+                if (x > xGridF && x < xGridG) return map[5][6];
+                if (x > xGridG && x <  width) return map[5][7];
+                break;
+
+            case 6:
+                if (x > 0      && x < xGridA) return map[6][0];
+                if (x > xGridA && x < xGridB) return map[6][1];
+                if (x > xGridB && x < xGridC) return map[6][2];
+                if (x > xGridC && x < xGridD) return map[6][3];
+                if (x > xGridD && x < xGridE) return map[6][4];
+                if (x > xGridE && x < xGridF) return map[6][5];
+                if (x > xGridF && x < xGridG) return map[6][6];
+                if (x > xGridG && x <  width) return map[6][7];
+                break;
+
+            case 7:
+                if (x > 0      && x < xGridA) return map[7][0];
+                if (x > xGridA && x < xGridB) return map[7][1];
+                if (x > xGridB && x < xGridC) return map[7][2];
+                if (x > xGridC && x < xGridD) return map[7][3];
+                if (x > xGridD && x < xGridE) return map[7][4];
+                if (x > xGridE && x < xGridF) return map[7][5];
+                if (x > xGridF && x < xGridG) return map[7][6];
+                if (x > xGridG && x <  width) return map[7][7];
+                break;
+                
+            default: break;
+        }
+        return false;
     }
 }

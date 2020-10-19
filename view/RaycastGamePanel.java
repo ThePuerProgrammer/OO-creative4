@@ -15,7 +15,7 @@ public class RaycastGamePanel implements Runnable {
     protected final int HEIGHT = 600;
     protected final int WIDTH = 600;
     private final Dimension gameView = new Dimension(WIDTH, HEIGHT); 
-    private Color bg = new Color(2, 15, 20);
+    private Color bg = new Color(2, 135, 140);
     private Thread thread;
     private RaycastCanvas2D canvas2D;
     private RaycastCanvas3D canvas3D;
@@ -23,10 +23,12 @@ public class RaycastGamePanel implements Runnable {
     private final int FPS = 60;
     private final int TIME = 1000 / FPS;
 
-    private boolean up;
-    private boolean down;
-    private boolean left;
-    private boolean right;
+    private boolean up = false;
+    private boolean down = false;
+    private boolean left = false;
+    private boolean right = false;
+    private boolean strafeLeft = false;
+    private boolean strafeRight = false;
 
     private enum GameState {
         STANDBY, RUNNING
@@ -120,6 +122,12 @@ public class RaycastGamePanel implements Runnable {
         } else if (right) {
             canvas2D.right();
         }
+
+        if (strafeLeft) {
+            canvas2D.strafeLeft();
+        } else if (strafeRight) {
+            canvas2D.strafeRight();
+        }
     }
 
     public void setUp(boolean up) {
@@ -136,5 +144,13 @@ public class RaycastGamePanel implements Runnable {
 
     public void setLeft(boolean left) {
         this.left = left;
+    }
+
+    public void setStrafeLeft(boolean strafeLeft) {
+        this.strafeLeft = strafeLeft;
+    }
+
+    public void setStrafeRight(boolean strafeRight) {
+        this.strafeRight = strafeRight;
     }
 }
