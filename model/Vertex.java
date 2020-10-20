@@ -9,7 +9,7 @@ public class Vertex {
     private double sinTheta;
     private double theta;
     private double[][] zRotationMatrix;
-    private int headingSpeed = 4;
+    private double headingSpeed = 4;
     private final double PI = 3.141592654;
 
     public Vertex(double x, double y, double z) {
@@ -51,7 +51,7 @@ public class Vertex {
         }
     }
 
-    public void rotateZ(int direction, int headingSpeed) {
+    public void rotateZ(int direction, double headingSpeed) {
         this.headingSpeed = headingSpeed;
         updateHeading(direction);
         rotate(zRotationMatrix);

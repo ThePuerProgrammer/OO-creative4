@@ -2,6 +2,7 @@ package view;
 
 import java.awt.Container;
 import java.awt.Dimension;
+import java.util.ArrayList;
 import java.awt.BorderLayout;
 import java.awt.Color;
 
@@ -9,19 +10,21 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 
 import controller.PlayerListener;
+import model.Ray;
 
 public class RaycastGamePanel implements Runnable {
 
     protected final int HEIGHT = 600;
     protected final int WIDTH = 600;
     private final Dimension gameView = new Dimension(WIDTH, HEIGHT); 
-    private Color bg = new Color(2, 135, 140);
+    private Color bg = new Color(20, 20, 22);
     private Thread thread;
     private RaycastCanvas2D canvas2D;
     private RaycastCanvas3D canvas3D;
     private PlayerListener l;
     private final int FPS = 60;
     private final int TIME = 1000 / FPS;
+    private ArrayList<Ray> rays;
 
     private boolean up = false;
     private boolean down = false;
@@ -77,6 +80,9 @@ public class RaycastGamePanel implements Runnable {
 
         l = new PlayerListener(this);
         window.addKeyListener(l);
+
+        rays = canvas2D.getRays();
+        canvas3D.setRays(rays);
 
         canvas2D.repaint();
         start();

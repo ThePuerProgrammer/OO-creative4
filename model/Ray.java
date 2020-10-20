@@ -6,6 +6,7 @@ import java.awt.BasicStroke;
 
 public class Ray extends Vertex {
     private Color c = Color.GREEN;
+    private double distance;
 
     public Ray(double x, double y, double z) {
         super(x, y, z);
@@ -24,5 +25,17 @@ public class Ray extends Vertex {
     public void castRay(double dx, double dy) {
         setX(getX() + dx);
         setY(getY() + dy);
+    }
+
+    public double getDistance() {
+        return distance;
+    }
+
+    public void setDistance(double distance) {
+        this.distance = distance;
+    }
+
+    public void setC(Color c) {
+        this.c = c;
     }
 }

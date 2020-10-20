@@ -26,7 +26,7 @@ public class Player {
         g2.setColor(c);
         g2.fillOval(x, y, 20, 20);
         g2.setColor(Color.BLACK);
-        g2.setStroke(new BasicStroke(3));
+        g2.setStroke(new BasicStroke(2.5f));
         g2.drawOval(x, y, 20, 20);
         g2.translate(x + 10, y + 10);
         g2.drawLine(0, 0, (int)(v.getX()), (int)(v.getY()));
