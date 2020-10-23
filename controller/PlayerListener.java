@@ -3,6 +3,7 @@ package controller;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
+import view.RaycastCanvas3D;
 import view.RaycastGamePanel;
 
 public class PlayerListener implements KeyListener {
@@ -17,6 +18,7 @@ public void keyTyped(KeyEvent e) {/**/}
 
     @Override
     public void keyPressed(KeyEvent e) {
+        if (RaycastCanvas3D.wasd != "") RaycastCanvas3D.wasd = "";
         int key = e.getKeyCode();
         switch (key) {
             case KeyEvent.VK_SHIFT:

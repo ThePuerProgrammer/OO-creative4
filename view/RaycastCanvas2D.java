@@ -9,7 +9,6 @@ import model.Vertex;
 
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -17,7 +16,6 @@ import java.awt.Dimension;
 public class RaycastCanvas2D extends JPanel {
     private static final long serialVersionUID = 1L;
 
-    private final double PI = 3.141592654;
     private RaycastGamePanel raycastGamePanel;
     private Graphics2D g2;
     private Player player;
@@ -27,7 +25,6 @@ public class RaycastCanvas2D extends JPanel {
     private ArrayList<Ray> rays = new ArrayList<>();
     private final Color boundaryColor = new Color(5, 5, 5);
     private final Color lineColor = new Color(220,220,220);
-    private final int PLAYER_SPEED = 2;
 
     // grid lines for raycasting
     // horizonal 
@@ -38,9 +35,7 @@ public class RaycastCanvas2D extends JPanel {
     private int xGridE;
     private int xGridF;
     private int xGridG;
-    private int[] horizonal = {
-        xGridA, xGridB, xGridC, xGridD, xGridE, xGridF, xGridG
-    };
+
     // vertical
     private int yGridA;
     private int yGridB;
@@ -49,9 +44,6 @@ public class RaycastCanvas2D extends JPanel {
     private int yGridE;
     private int yGridF;
     private int yGridG;
-    private int[] vertical = {
-        yGridA, yGridB, yGridC, yGridD, yGridE, yGridF, yGridG
-    };
 
     private boolean[][] map = {
         { true,  true,  true,  true,  true,  true,  true,  true},
@@ -141,6 +133,7 @@ public class RaycastCanvas2D extends JPanel {
         for (var r: rays) {
             r.render(g2, player.getX() + 10, player.getY() + 10, (int)(r.getX() + player.getX() + 10), (int)(r.getY() + player.getY() + 10));
         }
+
 
         // translate happens at end of function. Make last render
         player.render(g2);
@@ -255,7 +248,7 @@ public class RaycastCanvas2D extends JPanel {
                 v.rotateZ(-1, i);
                 rays.add(new Ray(v));
             }
-            for (double i = .2; i <= fov; i += .1) {
+            for (double i = .1; i <= fov + .1; i += .1) {
                 Vertex v = new Vertex(player.getV());
                 v.rotateZ(1, i);
                 rays.add(new Ray(v));
@@ -287,8 +280,8 @@ public class RaycastCanvas2D extends JPanel {
             r.castRay(-dx, -dy);
             r.setDistance(
                 Math.sqrt(
-                    Math.pow((r.getX() + player.getX() + 10) - player.getX() + 10, 2) +
-                    Math.pow((r.getY() + player.getY() + 10) - player.getY() + 10, 2)
+                    Math.pow((r.getX() + player.getX()) - player.getX(), 2) +
+                    Math.pow((r.getY() + player.getY()) - player.getY(), 2)
                 )
                 * Math.cos(player.getV().getTheta() - r.getTheta())
             );
